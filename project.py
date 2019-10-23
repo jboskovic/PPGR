@@ -6,22 +6,25 @@ import copy
 import math
 
 
-def solve_system(A, B, C, D):
-    result = np.array([D[0], D[1], 1])
-    matrix = np.array([[A[0], B[0], C[0]], [A[1], B[1], C[1]], [1, 1, 1]])
+def solve_system(points):
+    A,B,C,D = points
+    result = np.array(D)
+    matrix = np.array([[A[0], B[0], C[0]], [A[1], B[1], C[1]], [A[2], B[2], C[2]]])
     xs = np.linalg.solve(matrix, result)
     print(xs)
     return xs
 
 
-def naive_algorithm(A, B, C, D, Ap, Bp, Cp, Dp):
-    lambde = solve_system(A, B, C, D)
-    lambdep = solve_system(Ap, Bp, Cp, Dp)
+def naive_algorithm(originals, pictures):
+    A,B,C,D = originals
+    Ap,Bp,Cp,Dp = pictures
+    lambde = solve_system(originals)
+    lambdep = solve_system(pictures)
     P1 = np.array([[lambde[0]*A[0], lambde[1]*B[0], lambde[2]*C[0]], [lambde[0]
-                                                                      * A[1], lambde[1]*B[1], lambde[2]*C[1]], [lambde[0], lambde[1], lambde[2]]])
+                                                                      * A[1], lambde[1]*B[1], lambde[2]*C[1]], [lambde[0]*A[2], lambde[1]*B[2], lambde[2]*C[2]]])
 
     P2 = np.array([[lambdep[0]*Ap[0], lambdep[1]*Bp[0], lambdep[2]*Cp[0]], [lambdep[0]
-                                                                            * Ap[1], lambdep[1]*Bp[1], lambdep[2]*Cp[1]], [lambdep[0], lambdep[1], lambdep[2]]])
+                                                                            * Ap[1], lambdep[1]*Bp[1], lambdep[2]*Cp[1]], [lambdep[0]*Ap[2], lambdep[1]*B[2], lambdep[2]*Cp[2]]])
 
     P = np.dot(P2, np.linalg.inv(P1))
     return P
@@ -130,4 +133,8 @@ def dlt_normalize(originals, pictures):
 
 
 #dlt([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]])
-dlt_normalize([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]])
+#dlt_normalize([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]])
+#print(naive_algorithm([[-3,-1,1],[3,-1,1], [1,1,1], [-1,1,1]], [[-2,-1,1], [2,-1,1], [2,1,1], [-2,1,1]]))
+#print(naive_algorithm([[1,1,1],[5,2,1], [6,4,1], [-1,7,1]], [[0,0,1], [10,0,1], [10,5,1], [0,5,1]]))
+#print(dlt([[1,1,1],[5,2,1], [6,4,1], [-1,7,1]], [[0,0,1], [10,0,1], [10,5,1], [0,5,1]]))0
+#print(dlt([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]]))
