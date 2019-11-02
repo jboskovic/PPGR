@@ -135,8 +135,8 @@ def enter_coordinates():
     return coordinates
 
 
-def picture_edit():
-    picture_old = Image.open('bridge.bmp')
+def picture_edit(name):
+    picture_old = Image.open(name)
     picture_old.show()
     dimensions = picture_old.size
     picture_new = Image.new('RGB', dimensions, 'black')
@@ -190,7 +190,7 @@ def picture_edit():
             else:
                 pixel_new[i,j] = pixel_old[x,y]
             
-    picture_new.save("slika.bmp")
+    picture_new.save('building_edited.bmp')
     picture_new.show()
     return
 
@@ -245,7 +245,7 @@ def comparasion_between_algorithms():
 
 # comparasion_between_algorithms()
 
-picture_edit()
+picture_edit("building.bmp")
 
 #comparasion_between_algorithms()
 
