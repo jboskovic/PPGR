@@ -195,8 +195,8 @@ def picture_edit():
     return
 
 def comparasion_between_algorithms():
-    original = np.array([[1, 1, 1], [5, 2,1], [6, 4,1],[-1, 7,1],[3,1,1]])
-    picture =  np.array([[0,0,1],[10,0,1],[10,5,1],[0,5,1],[3,-1,1]])
+    original = np.array([[1.0, 1.0, 1.0], [5.0, 2.0,1.0], [6.0, 4.0,1.0],[-1.0, 7.0,1.0],[3.0,1.0,1.0]])
+    picture =  np.array([[0.0,0.0,1.0],[10.0,0.0,1.0],[10.0,5.0,1.0],[0.0,5.0,1.0],[3.0,-1.0,1.0]])
 
 
     C1 = np.array([[0, 1, 2], [-1, 0, 3], [0, 0, 1]])
@@ -226,12 +226,11 @@ def comparasion_between_algorithms():
 
     P_tmp = (P[0]/P_tmp[0])*P_tmp
     
-    # print(P)
-    # print(P_tmp)
+    print("DLT algorithm: ")
+    print(P)
+    print(P_tmp)
 
 
-    print(original)
-    print(picture)
     P = dlt_normalize(original,picture)
     Pp = dlt_normalize(original_new, picture_new)
     
@@ -240,13 +239,15 @@ def comparasion_between_algorithms():
     P_tmp= np.dot(np.linalg.inv(C2), Pp)
     P_tmp = np.dot(P_tmp, C1)
     
+    print("DLT modified algorithm: ")
     print(P)
     print(P_tmp)
 
 # comparasion_between_algorithms()
-# picture_edit()
 
-comparasion_between_algorithms()
+picture_edit()
+
+#comparasion_between_algorithms()
 
 # dlt([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]])
 # print(dlt_normalize([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]]))
