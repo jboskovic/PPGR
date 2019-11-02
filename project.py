@@ -1,25 +1,25 @@
 import numpy as np
 import numpy.linalg
-import matplotlib.pyplot as plt
-from matplotlib import image
 from matplotlib import pyplot
-import tkinter as tk
 import copy
 import math
 from PIL import Image
 
+
 def solve_system(points):
-    A,B,C,D = points
+    # lambda1*A+lambda2*B+lambda3*C = D
+    A, B, C, D = points
     result = np.array(D)
-    matrix = np.array([[A[0], B[0], C[0]], [A[1], B[1], C[1]], [A[2], B[2], C[2]]])
+    matrix = np.array(
+        [[A[0], B[0], C[0]], [A[1], B[1], C[1]], [A[2], B[2], C[2]]])
     lambdas = np.linalg.solve(matrix, result)
 
     return lambdas
 
 
 def naive_algorithm(originals, pictures):
-    A,B,C,D = originals
-    Ap,Bp,Cp,Dp = pictures
+    A, B, C, D = originals
+    Ap, Bp, Cp, Dp = pictures
     lambde = solve_system(originals)
     lambdep = solve_system(pictures)
     P1 = np.array([[lambde[0]*A[0], lambde[1]*B[0], lambde[2]*C[0]], [lambde[0]
@@ -33,6 +33,7 @@ def naive_algorithm(originals, pictures):
 
 
 def normalization(points):
+    # (x,y) - teziste sistema tacaka
     x = 0.0
     y = 0.0
     num_points = len(points)
@@ -40,15 +41,14 @@ def normalization(points):
         x = x + float(points[i][0]/points[i][2])
         y = y + float(points[i][1]/points[i][2])
 
-
     x = float(x) / float(num_points)
     y = float(y) / float(num_points)
 
     distance_sum = 0.0
 
     for i in range(num_points):
-        tmp1 = points[i][0]/points[i][2] - x
-        tmp2 = points[i][1]/points[i][2] - y
+        tmp1 = float(points[i][0])/float(points[i][2]) - x
+        tmp2 = float(points[i][1])/float(points[i][2]) - y
         distance_sum = distance_sum + \
             math.sqrt(tmp1**2+tmp2**2)
 
@@ -56,17 +56,20 @@ def normalization(points):
     k = float(math.sqrt(2)) / distance_sum
     return np.array([[k, 0, -k*x], [0, k, -k*y], [0, 0, 1]])
 
+
 def dlt(originals, pictures):
     x1 = float(originals[0][0])
     x2 = float(originals[0][1])
     x3 = float(originals[0][2])
 
-
     x1p = float(pictures[0][0])
     x2p = float(pictures[0][1])
     x3p = float(pictures[0][2])
 
-    A = np.array([[0,0,0,(-1)*x3p*x1,(-1)*x3p*x2,(-1)*x3p*x3,x2p*x1,x2p*x2,x2p*x3],[x3p*x1,x3p*x2,x3p*x3,0,0,0,(-1)*x1p*x1,(-1)*x1p*x2,(-1)*x1p*x3]])
+    A = np.array([
+        [0, 0, 0, (-1)*x3p*x1, (-1)*x3p*x2, (-1)*x3p*x3, x2p*x1, x2p*x2, x2p*x3],
+        [x3p*x1, x3p*x2, x3p*x3, 0, 0, 0, (-1)*x1p*x1, (-1)*x1p*x2, (-1)*x1p*x3]
+    ])
 
     for i in range(1, len(originals)):
         x1 = originals[i][0]
@@ -83,42 +86,41 @@ def dlt(originals, pictures):
         A = np.vstack((A,r1))
         A = np.vstack((A,r2))
 
-  
+    # python numpy biblioteka ima funkciju koja radi svd dekompoziciju
     U, D, V = np.linalg.svd(A)
 
 
     P = V[-1].reshape(3,3)
-    
+  
 
     return P
 
 def dlt_normalize(originals, pictures):
     T = normalization(originals)
     Tp = normalization(pictures)
-
  
+    # pravimo deepcopy da ne bismo menjali koordinate tacaka (lista se prenosi po referenci)
     originals_copy = copy.deepcopy(originals)
     pictures_copy = copy.deepcopy(pictures)
+
     for i in range(len(originals)):
         [x, y, z] = np.dot(T, [originals[i][0], originals[i][1], originals[i][2]]) 
-        originals_copy[i][0] = x
-        originals_copy[i][1] = y
-        originals_copy[i][2] = z
+        originals_copy[i][0] = float(x)
+        originals_copy[i][1] = float(y)
+        originals_copy[i][2] = float(z)
 
     for i in range(len(pictures)):
         [x, y, z] = np.dot(Tp, [pictures[i][0], pictures[i][1], pictures[i][2]]) 
-        pictures_copy[i][0] = x
-        pictures_copy[i][1] = y
-        pictures_copy[i][2] = z
+        pictures_copy[i][0] = float(x)
+        pictures_copy[i][1] = float(y)
+        pictures_copy[i][2] = float(z)
 
-   
+
 
     Pp = dlt(originals_copy,pictures_copy)
 
-   
-    tmp = np.dot(np.linalg.inv(Tp), Pp)
-    P = np.dot(tmp, T)
-    
+    P = np.dot(np.linalg.inv(Tp), Pp)
+    P = np.dot(P, T)
 
     return P
 
@@ -128,13 +130,13 @@ def enter_coordinates():
     for i in range(4):
         coordinates[i][0] = float(input("Enter x coordinate "))
         coordinates[i][1] = float(input("Enter y coordinate "))
-        coordinates[i][2] = float(input("Enter z coordinate "))
+        coordinates[i][2] = 1
 
     return coordinates
 
 
 def picture_edit():
-    picture_old = Image.open('tower.bmp')
+    picture_old = Image.open('bridge.bmp')
     picture_old.show()
     dimensions = picture_old.size
     picture_new = Image.new('RGB', dimensions, 'black')
@@ -159,13 +161,20 @@ def picture_edit():
     vertic_mean = (AD_len + BC_len)/2
     horizontal_mean = (AB_len+DC_len)/2
 
-    part_up = (dimensions[1] - vertic_mean) / 2
-    part_left = (dimensions[0] - horizontal_mean) / 2
 
+    # koordinate tacaka slike odredjuemo tako sto izracunamo prosecnu duzinu vertiklanih (horizontalnih) duzi
+    # gornja leva tacka je ista kao gornja leva tacka originalne slike
+    # ostale tacke se racunaju tako da obrazuju pravougaonik i da su udaljene od gornje leve tacke za prosecnu duzinu vertikale(horizontale)
+ 
+    picture = [[A[0],A[1],1],[A[0]+horizontal_mean, A[1], 1], [A[0]+horizontal_mean,A[1]+vertic_mean, 1], [A[0], A[1]+vertic_mean,1]]
 
-    picture = [[part_left,part_up,1],[part_left+horizontal_mean, part_up,1], [part_left+horizontal_mean,part_up+vertic_mean, 1], [part_left, part_up+vertic_mean,1]]
+    # u ovom delu koda biramo koji algoritam zelimo da primenimo
     P = dlt(original, picture)
     P = np.linalg.inv(P)
+
+    # prolazimo kroz koordinate nove slike
+    # za svaku koordinatu nove slike racunamo koje su to kooridanate u originalnoj slici
+    # vrednost pikslea na novoj slici je vrednost piksel koji se nalazi na koordinatama stare slike
     for i in range(dimensions[0]):
         for j in range(dimensions[1]):
             new_coordinates = np.dot(P, [i,j,1])
@@ -185,13 +194,13 @@ def picture_edit():
     picture_new.show()
     return
 
-def difference():
-    original = [[1, 1, 1], [5, 2,1], [6, 4,1],[-1, 7,1],[3,1,1]]
-    picture =  [[0,0,1],[10,0,1],[10,5,1],[0,5,1],[3,-1,1]]
+def comparasion_between_algorithms():
+    original = np.array([[1, 1, 1], [5, 2,1], [6, 4,1],[-1, 7,1],[3,1,1]])
+    picture =  np.array([[0,0,1],[10,0,1],[10,5,1],[0,5,1],[3,-1,1]])
 
 
-    C1 = np.array([[0,1,2],[-1,0,3],[0,0,1]])
-    C2 = np.array([[1,-1,5],[1,1,-2],[0,0,1]])
+    C1 = np.array([[0, 1, 2], [-1, 0, 3], [0, 0, 1]])
+    C2 = np.array([[1, -1, 5], [1, 1, -2], [0, 0, 1]])
 
 
     original_new = []
@@ -200,44 +209,76 @@ def difference():
     for i in range(len(original)):
         original_new.append(np.dot(C1, original[i]))
         picture_new.append(np.dot(C2, picture[i]))
-        
+ 
+    original_new = np.array(original_new)
+    picture_new = np.array(picture_new)
 
-    P_dlt = dlt(original,picture)
-    Pp_dlt = dlt(original_new, picture_new)
+    P = dlt(original,picture)
+ 
+    Pp = dlt(original_new, picture_new)
+  
 
-    tmp_dlt = np.dot(np.linalg.inv(C2), Pp_dlt)
-    P_tmp_dlt= np.dot(tmp_dlt, C1)
-
-    P_tmp_dlt = (P_tmp_dlt/P_tmp_dlt[0][0])*P_dlt[0][0]
-
-
-
-    print(P_dlt)
-    print(P_tmp_dlt)
+    P_tmp = np.dot(np.linalg.inv(C2), Pp)
+    P_tmp= np.dot(P_tmp, C1)
 
 
-    P_dlt = dlt_normalize(original,picture)
-    Pp_dlt = dlt_normalize(original_new, picture_new)
+ 
 
-    tmp_dlt = np.dot(np.linalg.inv(C2), Pp_dlt)
-    P_tmp_dlt= np.dot(tmp_dlt, C1)
-
-
-    print(P_dlt)
-    print(P_tmp_dlt)
+    P_tmp = (P[0]/P_tmp[0])*P_tmp
+    
+    # print(P)
+    # print(P_tmp)
 
 
+    print(original)
+    print(picture)
+    P = dlt_normalize(original,picture)
+    Pp = dlt_normalize(original_new, picture_new)
+    
 
-picture_edit()
+
+    P_tmp= np.dot(np.linalg.inv(C2), Pp)
+    P_tmp = np.dot(P_tmp, C1)
+    
+    print(P)
+    print(P_tmp)
+
+# comparasion_between_algorithms()
+# picture_edit()
+
+comparasion_between_algorithms()
+
+# dlt([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]])
+# print(dlt_normalize([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]]))
+# print(naive_algorithm([[-3,-1,1],[3,-1,1], [1,1,1], [-1,1,1]], [[-2,-1,1], [2,-1,1], [2,1,1], [-2,1,1]]))
+# print(naive_algorithm([[1,1,1],[5,2,1], [6,4,1], [-1,7,1]], [[0,0,1], [10,0,1], [10,5,1], [0,5,1]]))
+# print(dlt([[1,1,1],[5,2,1], [6,4,1], [-1,7,1]], [[0,0,1], [10,0,1], [10,5,1], [0,5,1]]))
+
+# P = dlt([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]])
+# print(np.round(P, 5))
+# P_naive =  naive_algorithm([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1]])
+
+# P = (P/P[0,0])*P_naive[0,0]
+
+# print(np.round(P, 5))
+
+# P = dlt_normalize([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]])
+# print(np.round(P, 5))
 
 
-#cv2 - opencv (dodati biranje piksela)
+# P_naive =  naive_algorithm([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1]])
+
+# P = (P/P[0,0])*P_naive[0,0]
+
+# print(np.round(P, 5))
 
 
+# originals = np.array([[1,1,1],[5,2,1],[6,4,1],[-1,7,1]])
+# pictures = np.array([[0,0,1],[10,0,1],[10,5,1],[0,5,1]])
 
-#dlt([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]])
-#print(dlt_normalize([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]]))
-#print(naive_algorithm([[-3,-1,1],[3,-1,1], [1,1,1], [-1,1,1]], [[-2,-1,1], [2,-1,1], [2,1,1], [-2,1,1]]))
-#print(naive_algorithm([[1,1,1],[5,2,1], [6,4,1], [-1,7,1]], [[0,0,1], [10,0,1], [10,5,1], [0,5,1]]))
-#print(dlt([[1,1,1],[5,2,1], [6,4,1], [-1,7,1]], [[0,0,1], [10,0,1], [10,5,1], [0,5,1]]))0
-#print(dlt([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]]))
+# P = naive_algorithm(originals,pictures)
+# print(P)
+
+# P_dlt = dlt(originals, pictures)
+# print(P_dlt)
+
