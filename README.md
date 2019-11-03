@@ -1,6 +1,6 @@
 # PPGR
 
-## Seminarski iz Primene projektivne geomterije u racunarstvu
+## Seminarski iz Primene projektivne geometerije u racunarstvu
 
 Aplikacija ucitava bmp sliku, korisnik bira (unosi) 4 piksela koji se slikaju u pravougaonik (koji odredjuje aplikacija), a aplikacija vraca sliku sa otklonjenom projektivnom distorzijom
 
