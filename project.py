@@ -4,6 +4,7 @@ from matplotlib import pyplot
 import copy
 import math
 from PIL import Image
+import tkinter
 
 
 def solve_system(points):
@@ -127,6 +128,7 @@ def dlt_normalize(originals, pictures):
 
 def enter_coordinates():
     coordinates = [[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
+    print("Enter 4 random points ")
     for i in range(4):
         coordinates[i][0] = float(input("Enter x coordinate "))
         coordinates[i][1] = float(input("Enter y coordinate "))
@@ -135,7 +137,7 @@ def enter_coordinates():
     return coordinates
 
 
-def picture_edit(name):
+def picture_edit(name, algorithm):
     picture_old = Image.open(name)
     picture_old.show()
     dimensions = picture_old.size
@@ -169,7 +171,16 @@ def picture_edit(name):
     picture = [[A[0],A[1],1],[A[0]+horizontal_mean, A[1], 1], [A[0]+horizontal_mean,A[1]+vertic_mean, 1], [A[0], A[1]+vertic_mean,1]]
 
     # u ovom delu koda biramo koji algoritam zelimo da primenimo
-    P = dlt(original, picture)
+    if algorithm == 0:
+        P = naive_algorithm(original, picture)
+    elif algorithm == 1:
+        P = dlt(original, picture)
+    elif algorithm == 2:
+        P = dlt_normalize(original, picture)
+    else:
+        P = naive_algorithm(original, picture)
+
+   
     P = np.linalg.inv(P)
 
     # prolazimo kroz koordinate nove slike
@@ -243,11 +254,8 @@ def comparasion_between_algorithms():
     print(P)
     print(P_tmp)
 
-# comparasion_between_algorithms()
 
-picture_edit("building.bmp")
-
-#comparasion_between_algorithms()
+#
 
 # dlt([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]])
 # print(dlt_normalize([[-3, -1,1], [3, -1,1], [1, 1,1],[-1, 1,1],[1,2,3],[-8,-2,1]], [[-2, -1,1], [2, -1,1], [2, 1,1], [-2, 1,1],[2,1,4],[-16,-5,4]]))
@@ -282,4 +290,30 @@ picture_edit("building.bmp")
 
 # P_dlt = dlt(originals, pictures)
 # print(P_dlt)
+
+picture_name = input("Enter a name of a picture you want to edit: ")
+algorithm = int(input('Choose algorithm you want to use.\n0 - naive algorithm\n1 - dlt algorithm\n2 - modified dlt algorithm\n'))
+picture_edit(picture_name, algorithm)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
