@@ -14,3 +14,7 @@ Svaka napisana funkcija testirana je na standarnim tackama kao i na sopstvenim, 
 Napisana funkcija koja poredi dlt i modifikovani dlt algoritam kada se promene koordinate
 
 
+Domaci 2:
+
+Algortmi kretanja prostora
+
