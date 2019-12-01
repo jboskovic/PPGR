@@ -2,6 +2,8 @@
 
 ## Seminarski iz Primene projektivne geometerije u racunarstvu
 
+## Domaci 1:
+
 Aplikacija ucitava bmp sliku, korisnik bira (unosi) 4 piksela koji se slikaju u pravougaonik (koji odredjuje aplikacija), a aplikacija vraca sliku sa otklonjenom projektivnom distorzijom
 
 Korisnik moze da bira koji algoritam zeli da primeni:
@@ -14,7 +16,7 @@ Svaka napisana funkcija testirana je na standarnim tackama kao i na sopstvenim, 
 Napisana funkcija koja poredi dlt i modifikovani dlt algoritam kada se promene koordinate
 
 
-Domaci 2:
+## Domaci 2:
 
 Algortmi kretanja prostora
 
